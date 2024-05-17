@@ -1,0 +1,6 @@
+@Easi_TaskDemo_HostAddress = http://localhost:5255
+
+GET {{Easi_TaskDemo_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
