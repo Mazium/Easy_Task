@@ -10,15 +10,10 @@ namespace Easy_Task.Persistence.Context
 
         public DbSet<Employee> Employees { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
-
-            // Configure relationships and other constraints here if needed
-            builder.Entity<Employee>()
-                .HasOne(e => e.AppUser)
-                .WithMany() 
-                .HasForeignKey(e => e.AppUserId);
+            base.OnModelCreating(modelBuilder);
+         
         }
 
     }

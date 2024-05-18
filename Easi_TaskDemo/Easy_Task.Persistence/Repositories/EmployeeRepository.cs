@@ -13,10 +13,10 @@ namespace Easy_Task.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<Employee> GetEmployeeByAppUserIdAsync(string appUserId)
+        public async Task<Employee> GetEmployeeByIdAsync(string Id)
         {
             return await _context.Employees
-                                 .FirstOrDefaultAsync(e => e.AppUserId == appUserId);
+                                 .FirstOrDefaultAsync(e => e.Id == Id);
         }
     }
    

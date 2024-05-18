@@ -7,6 +7,7 @@ namespace Easy_Task.Persistence.Repositories
     {
         private readonly EasyTaskDbContext _context;
         private IEmployeeRepository _employeeRepository;
+       
 
         public UnitOfWork(EasyTaskDbContext context)
         {

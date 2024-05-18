@@ -9,8 +9,8 @@ namespace Easi_TaskDemo.Mapper
         public MapperProfile()
         {
             CreateMap<Employee, EmployeeDto>().ReverseMap();
-            CreateMap<CreateEmployeeDto, Employee>();
-            CreateMap<UpdateEmployeeDto, Employee>();
+            CreateMap<CreateEmployeeDto, Employee>().ReverseMap();
+            CreateMap<UpdateEmployeeDto, Employee>().ReverseMap();
         }
     }
 }
