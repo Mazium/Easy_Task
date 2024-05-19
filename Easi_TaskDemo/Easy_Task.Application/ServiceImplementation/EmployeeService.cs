@@ -5,6 +5,7 @@ using Easy_Task.Application.Interface.Services;
 using Easy_Task.Domain.Entities;
 using Easy_Task.Domain.ResponseSystem;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using static Easy_Task.Application.Validators.Validators;
 
@@ -23,10 +24,11 @@ namespace Easy_Task.Application.ServiceImplementation
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ApiResponse<EmployeeDto>> CreateEmployeeAsync(CreateEmployeeDto createEmployeeDto)
+        public async Task<ApiResponse<EmployeeDto>> CreateEmployeeAsync(CreateEmployeeDto createEmployeeDto, string AppUserId)
         {
             try
             {
+                // Validate the DTO
                 var validator = new CreateEmployeeDtoValidator();
                 var validationResult = await validator.ValidateAsync(createEmployeeDto);
 
@@ -34,17 +36,20 @@ namespace Easy_Task.Application.ServiceImplementation
                 {
                     return ApiResponse<EmployeeDto>.Failed(validationResult.Errors.ConvertAll(x => x.ErrorMessage));
                 }
-
+              
                 var employee = _mapper.Map<Employee>(createEmployeeDto);
+                
+                employee.AppUserId = AppUserId;
+               
                 await _unitOfWork.EmployeeRepository.AddAsync(employee);
-                await _unitOfWork.SaveChangesAsync();
-
-                var employeeDto = _mapper.Map<EmployeeDto>(employee);
+               
+                await _unitOfWork.SaveChangesAsync();                
+                var employeeDto = _mapper.Map<EmployeeDto>(employee);               
                 return ApiResponse<EmployeeDto>.Success(employeeDto, "Employee created successfully", 201);
             }
             catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating the employee");
+            {             
+                _logger.LogError(ex, "An error occurred while creating the employee");              
                 return ApiResponse<EmployeeDto>.Failed(new List<string> { "An error occurred while creating the employee.", ex.Message });
             }
         }
@@ -68,6 +73,27 @@ namespace Easy_Task.Application.ServiceImplementation
                 return ApiResponse<EmployeeDto>.Failed(new List<string> { "An error occurred while retrieving the employee.", ex.Message });
             }
         }
+
+        public async Task<ApiResponse<List<EmployeeDto>>> GetEmployeesByUserIdAsync(string userId)
+        {
+            try
+            {
+                var employees = await _unitOfWork.EmployeeRepository.GetEmployeesByUserIdAsync(userId);
+                if (employees == null || !employees.Any())
+                {
+                    return ApiResponse<List<EmployeeDto>>.Failed("No employees found for the user", 404, new List<string> { "No employees found" });
+                }
+
+                var employeeDtos = _mapper.Map<List<EmployeeDto>>(employees);
+                return ApiResponse<List<EmployeeDto>>.Success(employeeDtos, "Employees found", 200);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving employees for userId: {UserId}", userId);
+                return ApiResponse<List<EmployeeDto>>.Failed(new List<string> { "An error occurred while retrieving employees.", ex.Message });
+            }
+        }
+
 
 
         public async Task<ApiResponse<List<EmployeeDto>>> GetAllEmployeesAsync()

@@ -7,10 +7,12 @@ namespace Easy_Task.Application.Interface.Services
     {
         Task<ApiResponse> DeleteEmployeeAsync(string id);
         Task<ApiResponse<EmployeeDto>> UpdateEmployeeAsync(string id, UpdateEmployeeDto updateEmployeeDto);
-        Task<ApiResponse<EmployeeDto>> CreateEmployeeAsync(CreateEmployeeDto createEmployeeDto);
+        Task<ApiResponse<EmployeeDto>> CreateEmployeeAsync(CreateEmployeeDto createEmployeeDto, string Id);
         Task<ApiResponse<EmployeeDto>> GetEmployeeByIdAsync(string id);
         Task<ApiResponse<List<EmployeeDto>>> GetAllEmployeesAsync();
-       
+        Task<ApiResponse<List<EmployeeDto>>> GetEmployeesByUserIdAsync(string userId);
+
+
 
     }
 }

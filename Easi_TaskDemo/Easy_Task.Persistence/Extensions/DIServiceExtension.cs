@@ -22,25 +22,11 @@ namespace Easy_Task.Persistence.Extensions
             services.AddDbContext<EasyTaskDbContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
-            // Support string to enum conversions
-            //services.AddControllers().AddJsonOptions(opt =>
-            //{
-            //    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            //});
+            services
+                 .AddIdentity<AppUser, IdentityRole>()
+                 .AddEntityFrameworkStores<EasyTaskDbContext>()
+                 .AddDefaultTokenProviders();
 
-
-            // Specify identity requirements
-            //services.AddIdentity<AppUser, IdentityRole>(options =>
-            //{
-            //    options.SignIn.RequireConfirmedAccount = false;
-            //    options.User.RequireUniqueEmail = true;
-            //    options.Password.RequireDigit = false;
-            //    options.Password.RequiredLength = 6;
-            //    options.Password.RequireNonAlphanumeric = false;
-            //    options.Password.RequireUppercase = false;
-            //})
-            //   .AddEntityFrameworkStores<EasyTaskDbContext>()
-            //   .AddDefaultTokenProviders();
 
 
             // Register generic repository
@@ -49,9 +35,8 @@ namespace Easy_Task.Persistence.Extensions
 
             services.AddValidatorsFromAssemblyContaining<CreateEmployeeDtoValidator>();
             services.AddScoped<IEmployeeService, EmployeeService >();
-           // services.AddScoped<TokenService, TokenService >();
-            services.AddScoped<IAuthService, AuthService >();
-
+            services.AddTransient<IAuthService, AuthService>();
+          
         }
     }
 }
