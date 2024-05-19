@@ -14,7 +14,7 @@ Framework: Dotnet 8
 Database: PostgreSQL
 Logging: Serilog
 WebSocket: SignalR(wss:///localhost:7203/streaming-hub)
-Source Control: GitHub
+Validation: Fluent Validation
 
 # Installation
 git clone https://github.com/Mazium/Easy_Task.git
