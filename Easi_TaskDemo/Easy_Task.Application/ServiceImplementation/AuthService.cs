@@ -96,7 +96,7 @@ namespace Easy_Task.Application.ServiceImplementation
             {
                 Issuer = _configuration["JwtSettings:ValidIssuer"],
                 Audience = _configuration["JwtSettings:ValidAudience"],
-                Expires = DateTime.UtcNow.AddMinutes(2), // expires in 2 minutes
+                Expires = DateTime.UtcNow.AddHours(1), 
                 SigningCredentials = new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256),
                 Subject = new ClaimsIdentity(claims)
             };

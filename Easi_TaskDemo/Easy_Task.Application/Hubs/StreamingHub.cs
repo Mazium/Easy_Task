@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace Easi_TaskDemo.Hubs
+namespace Easy_Task.Application.Hubs
 {
-    public sealed class StreamingHub: Hub
+    public class StreamingHub: Hub
     {
         public override async Task OnConnectedAsync()
         {

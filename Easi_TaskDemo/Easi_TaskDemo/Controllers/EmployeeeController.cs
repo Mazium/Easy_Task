@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace Easy_Task.API.Controllers
 {
-    
+    [Authorize(Roles = UserRoles.Admin)]
     [ApiController]
     [Route("[controller]")]
     public class EmployeeController : ControllerBase
@@ -23,18 +23,19 @@ namespace Easy_Task.API.Controllers
         }
 
 
-        [Authorize(Roles = UserRoles.Admin)]
+       
         [HttpPost("create-new")]
         public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeDto createEmployeeDto)
         {
-            var appUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-            Console.WriteLine(appUserId);
-            var response = await _employeeService.CreateEmployeeAsync(createEmployeeDto, appUserId);
+            var response = await _employeeService.CreateEmployeeAsync(createEmployeeDto, User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            if (!response.Succeeded)
+            {
+                return BadRequest(response.Message);
+            }
 
             return CreatedAtAction(nameof(GetEmployeeById), new { id = response.Data.Id }, response);
         }
-
         [HttpGet("get-by-UserId/{userId}")]
         public async Task<IActionResult> GetEmployeeByUserId(string userId)
         {
@@ -53,7 +54,7 @@ namespace Easy_Task.API.Controllers
             return Ok( await _employeeService.GetEmployeeByIdAsync(id));
         }
 
-        [Authorize(Roles = UserRoles.Admin)]
+        
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAllEmployees()
         {

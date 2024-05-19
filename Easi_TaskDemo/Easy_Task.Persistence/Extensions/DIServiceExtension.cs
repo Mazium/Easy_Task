@@ -5,6 +5,7 @@ using Easy_Task.Domain.Entities;
 using Easy_Task.Persistence.Context;
 using Easy_Task.Persistence.Repositories;
 using FluentValidation;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,15 @@ namespace Easy_Task.Persistence.Extensions
             services.AddScoped<IEmployeeService, EmployeeService >();
             services.AddTransient<IAuthService, AuthService>();
           
+        }
+
+        public static void ApplyMigrations(this IApplicationBuilder app)
+        {
+            using IServiceScope scope = app.ApplicationServices.CreateScope();
+            using EasyTaskDbContext dbContext =
+                scope.ServiceProvider.GetRequiredService<EasyTaskDbContext>();
+
+            dbContext.Database.Migrate();
         }
     }
 }

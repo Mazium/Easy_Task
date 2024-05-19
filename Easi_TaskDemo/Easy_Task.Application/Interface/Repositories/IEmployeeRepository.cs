@@ -5,5 +5,6 @@ namespace Easy_Task.Application.Interface.Repositories
     public interface IEmployeeRepository: IGenericRepository<Employee>
     {
         Task<List<Employee>> GetEmployeesByUserIdAsync(string userId);
+        Task<Employee> GetEmployeeByEmailAsync(string email);
     }
 }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Easy_Task.Persistence.Migrations
 {
     [DbContext(typeof(EasyTaskDbContext))]
-    [Migration("20240518135536_InitialMigration")]
+    [Migration("20240519145432_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -33,9 +33,6 @@ namespace Easy_Task.Persistence.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("text");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -51,10 +48,14 @@ namespace Easy_Task.Persistence.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -110,7 +111,8 @@ namespace Easy_Task.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Address")
-                        .HasColumnType("text");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("AppUserId")
                         .HasColumnType("text");
@@ -118,17 +120,29 @@ namespace Easy_Task.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<decimal>("Salary")
                         .HasColumnType("numeric");
@@ -275,7 +289,7 @@ namespace Easy_Task.Persistence.Migrations
             modelBuilder.Entity("Easy_Task.Domain.Entities.Employee", b =>
                 {
                     b.HasOne("Easy_Task.Domain.Entities.AppUser", "AppUser")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("AppUserId");
 
                     b.Navigation("AppUser");
@@ -330,6 +344,11 @@ namespace Easy_Task.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Easy_Task.Domain.Entities.AppUser", b =>
+                {
+                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

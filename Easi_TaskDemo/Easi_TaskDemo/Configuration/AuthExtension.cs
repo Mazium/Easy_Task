@@ -18,7 +18,7 @@ namespace Easi_TaskDemo.Configuration
                 ValidateIssuerSigningKey = true,
                 ValidAudience = configuration["JwtSettings:ValidAudience"],
                 ValidIssuer = configuration["JwtSettings:ValidIssuer"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)), // Use the correct secret key
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
                 ClockSkew = TimeSpan.Zero
             };
 

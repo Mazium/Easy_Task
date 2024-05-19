@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Easy_Task.Application.Validators
 {
-    public class Validators
+    public static class Validators
     {
         public class CreateEmployeeDtoValidator : AbstractValidator<CreateEmployeeDto>
         {
@@ -16,7 +16,7 @@ namespace Easy_Task.Application.Validators
             
                 RuleFor(dto => dto.PhoneNumber)
                     .NotEmpty().WithMessage("Phone number is required")
-                    .Matches(@"^\+?\d{0,2}\-?\d{4,5}\-?\d{5,6}$").WithMessage("Invalid phone number");
+                    .Matches(@"^\+?\d{11}(?:\-\d{4,5}\-?\d{5,6})?$").WithMessage("Invalid phone number");
             }
         }
 
@@ -31,7 +31,7 @@ namespace Easy_Task.Application.Validators
 
                 RuleFor(dto => dto.PhoneNumber)
                     .NotEmpty().WithMessage("Phone number is required")
-                    .Matches(@"^\+?\d{0,2}\-?\d{4,5}\-?\d{5,6}$").WithMessage("Invalid phone number");
+                    .Matches(@"^\+?\d{11}(?:\-\d{4,5}\-?\d{5,6})?$").WithMessage("Invalid phone number");
             }
         }
     }

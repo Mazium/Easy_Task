@@ -6,43 +6,63 @@ namespace Easy_Task.Common.Utilities
 {
     public static class Seeder
     {
-       
         public static async Task SeedRolesAndSuperAdmin(IServiceProvider serviceProvider)
         {
             try
             {
-                var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
-
-                // Seed roles
-                if (!await roleManager.RoleExistsAsync("Admin"))
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    var role = new IdentityRole("Admin");
-                    await roleManager.CreateAsync(role);
-                }
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-                if (!await roleManager.RoleExistsAsync("User"))
-                {
-                    var role = new IdentityRole("User");
-                    await roleManager.CreateAsync(role);
-                }
+                    var roles = new[] { "Admin", "User" };
+                    var roleTasks = roles
+                        .Where(role => !roleManager.RoleExistsAsync(role).Result)
+                        .Select(role => roleManager.CreateAsync(new IdentityRole(role)));
 
-                if (userManager.FindByNameAsync("Admin").Result == null)
-                {
-                    var user = new AppUser
+                    var roleResults = await Task.WhenAll(roleTasks);
+
+                    foreach (var result in roleResults)
                     {
-                        UserName = "Admin",
-                        Email = "admin@gmail.com",
-                        EmailConfirmed = true,
-                        FirstName = "Admin",
-                        CreatedAt = DateTime.UtcNow
-                    };
+                        if (!result.Succeeded)
+                        {
+                            LogErrors(result.Errors);
+                        }
+                    }
 
-                    var result = userManager.CreateAsync(user, "Password@123").Result;
-
-                    if (result.Succeeded)
+                    var adminUser = await userManager.FindByNameAsync("Admin");
+                    if (adminUser == null)
                     {
-                        userManager.AddToRoleAsync(user, "Admin").Wait();
+                        adminUser = new AppUser
+                        {
+                            UserName = "Admin",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = true,
+                            FirstName = "Admin",
+                            LastName = "User", // Ensure you have LastName if needed
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        var userResult = await RegisterUserAsync(userManager, adminUser, "Password@123");
+                        if (!userResult.Succeeded)
+                        {
+                            LogErrors(userResult.Errors);
+                        }
+                    }
+
+                    var rolesToAssign = new[] { "Admin", "User" };
+                    var roleAssignmentTasks = rolesToAssign
+                        .Where(role => !userManager.IsInRoleAsync(adminUser, role).Result)
+                        .Select(role => userManager.AddToRoleAsync(adminUser, role));
+
+                    var roleAssignmentResults = await Task.WhenAll(roleAssignmentTasks);
+
+                    foreach (var result in roleAssignmentResults)
+                    {
+                        if (!result.Succeeded)
+                        {
+                            LogErrors(result.Errors);
+                        }
                     }
                 }
             }
@@ -50,13 +70,29 @@ namespace Easy_Task.Common.Utilities
             {
                 LogException(ex);
             }
+        }
 
+        private static async Task<IdentityResult> RegisterUserAsync(UserManager<AppUser> userManager, AppUser user, string password)
+        {
+            var result = await userManager.CreateAsync(user, password);
+            if (result.Succeeded)
+            {
+                // Additional logic for successful registration, like sending confirmation email, etc.
+            }
+            return result;
+        }
+
+        private static void LogErrors(IEnumerable<IdentityError> errors)
+        {
+            foreach (var error in errors)
+            {
+                Console.WriteLine($"Error: {error.Description}");
+            }
         }
 
         private static void LogException(Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
-
             if (ex.InnerException != null)
             {
                 Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
